@@ -126,8 +126,8 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
     </a>
 </kbd>
 
-# if installer not worke
-- enable sodium and gb extension from php.ini
+# if installer not work
+- enable sodium, intl and gb extension from php.ini
 - composer install
 - create env fill in a values, ref: .env.example
 - php artisan key:generate
