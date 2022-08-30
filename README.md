@@ -125,3 +125,13 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
         <img src="https://images.opencollective.com/e-ventures1/7d61db2/logo.png" height="75">
     </a>
 </kbd>
+
+# if installer not worke
+- enable sodium and gb extension from php.ini
+- composer install
+- create env fill in a values, ref: .env.example
+- php artisan key:generate
+- php artisan migrate
+- php artisan db:seed
+- composer dump-autoload
+- php artisan vendor:publish
