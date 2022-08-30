@@ -135,3 +135,4 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 - php artisan db:seed
 - composer dump-autoload
 - php artisan vendor:publish
+- php artisan jwt:secret (in case got JWT issue while login)
