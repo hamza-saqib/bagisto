@@ -9,6 +9,7 @@ use Webkul\Customer\Http\Controllers\RegistrationController;
 use Webkul\Customer\Http\Controllers\ResetPasswordController;
 use Webkul\Customer\Http\Controllers\SessionController;
 use Webkul\Customer\Http\Controllers\WishlistController;
+use Webkul\Customer\Http\Controllers\CustomerClothProfileController;
 use Webkul\Shop\Http\Controllers\DownloadableProductController;
 use Webkul\Shop\Http\Controllers\OrderController;
 use Webkul\Shop\Http\Controllers\ReviewController;
@@ -214,5 +215,17 @@ Route::group(['middleware' => ['web', 'locale', 'theme', 'currency']], function 
                 });
             });
         });
+    });
+});
+
+//api new routes
+Route::group(['prefix' => 'api'], function ($router) {
+
+    Route::group(['middleware' => ['locale', 'theme', 'currency']], function ($router) {
+
+        Route::get('customer/cloth-profile/index', [CustomerClothProfileController::class, 'index']);
+        Route::post('customer/cloth-profile/store', [CustomerClothProfileController::class, 'store']);
+        Route::put('customer/cloth-profile/update/{id}', [CustomerClothProfileController::class, 'update']);
+
     });
 });
