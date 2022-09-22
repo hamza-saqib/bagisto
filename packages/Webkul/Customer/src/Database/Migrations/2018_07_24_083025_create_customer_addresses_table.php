@@ -26,6 +26,7 @@ class CreateCustomerAddressesTable extends Migration
             $table->string('phone');
             $table->boolean('default_address')->default(0);
             $table->string('name')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }
