@@ -9,7 +9,7 @@ use Webkul\Customer\Http\Controllers\RegistrationController;
 use Webkul\Customer\Http\Controllers\ResetPasswordController;
 use Webkul\Customer\Http\Controllers\SessionController;
 use Webkul\Customer\Http\Controllers\WishlistController;
-use Webkul\Customer\Http\Controllers\CustomerClothProfileController;
+use Webkul\Customer\Http\Controllers\API\CustomerClothProfileController;
 use Webkul\Shop\Http\Controllers\DownloadableProductController;
 use Webkul\Shop\Http\Controllers\OrderController;
 use Webkul\Shop\Http\Controllers\ReviewController;

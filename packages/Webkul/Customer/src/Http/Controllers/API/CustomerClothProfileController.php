@@ -1,10 +1,11 @@
 <?php
 
-namespace Webkul\Customer\Http\Controllers;
+namespace Webkul\Customer\Http\Controllers\API;
 
 use Webkul\Customer\Repositories\CustomerAddressRepository;
 use Webkul\API\Http\Resources\Customer\CustomerAddress as CustomerAddressResource;
 use Webkul\Customer\Models\CustomerClothProfile;
+use App\Http\Controllers\Controller;
 
 class CustomerClothProfileController extends Controller
 {
@@ -90,12 +91,12 @@ class CustomerClothProfileController extends Controller
         }
 
         $this->validate(request(), [
-            'product_id' => 'integer|required',
+            'name' => 'string|required',
             'profile_data' => 'array|required',
         ]);
 
         $customerClothProfile = CustomerClothProfile::create([
-            'product_id' => request()->input('product_id'),
+            'name' => request()->input('name'),
             'customer_id' => $customer->id,
             'profile_data' => request()->input('profile_data')
         ]);
@@ -124,15 +125,15 @@ class CustomerClothProfileController extends Controller
         }
 
         $this->validate(request(), [
-            'product_id' => 'integer|required',
+            'name' => 'string|required',
             'profile_data' => 'array|required',
         ]);
 
         $customerClothProfile = CustomerClothProfile::find($id);
-        
+
         if($customerClothProfile){
             if($customerClothProfile == $customer->id){
-                $customerClothProfile->product_id = request()->input('product_id');
+                $customerClothProfile->name = request()->input('name');
                 $customerClothProfile->profile_data = request()->input('profile_data');
                 $customerClothProfile->save();
                 return response()->json([
