@@ -91,12 +91,12 @@ class CustomerClothProfileController extends Controller
         }
 
         $this->validate(request(), [
-            'name' => 'string|required',
+            'profile_name' => 'string|required',
             'profile_data' => 'array|required',
         ]);
 
         $customerClothProfile = CustomerClothProfile::create([
-            'name' => request()->input('name'),
+            'profile_name' => request()->input('profile_name'),
             'customer_id' => $customer->id,
             'profile_data' => request()->input('profile_data')
         ]);
@@ -125,7 +125,7 @@ class CustomerClothProfileController extends Controller
         }
 
         $this->validate(request(), [
-            'name' => 'string|required',
+            'profile_name' => 'string|required',
             'profile_data' => 'array|required',
         ]);
 
@@ -133,7 +133,7 @@ class CustomerClothProfileController extends Controller
 
         if($customerClothProfile){
             if($customerClothProfile == $customer->id){
-                $customerClothProfile->name = request()->input('name');
+                $customerClothProfile->profile_name = request()->input('profile_name');
                 $customerClothProfile->profile_data = request()->input('profile_data');
                 $customerClothProfile->save();
                 return response()->json([

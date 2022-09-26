@@ -19,10 +19,10 @@ class CustomerClothProfile extends Model implements CustomerClothProfileContract
     ];
 
     protected $fillable = [
-        'product_id',
+        'profile_name',
         'customer_id',
         'profile_data',
     ];
 
-    
+
 }
