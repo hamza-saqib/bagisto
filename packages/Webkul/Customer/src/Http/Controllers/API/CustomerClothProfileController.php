@@ -132,7 +132,7 @@ class CustomerClothProfileController extends Controller
         $customerClothProfile = CustomerClothProfile::find($id);
 
         if($customerClothProfile){
-            if($customerClothProfile->id == $customer->id){
+            if($customerClothProfile->customer_id == $customer->id){
                 $customerClothProfile->profile_name = request()->input('profile_name');
                 $customerClothProfile->profile_data = request()->input('profile_data');
                 $customerClothProfile->save();
