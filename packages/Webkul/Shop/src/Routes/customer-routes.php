@@ -226,6 +226,7 @@ Route::group(['prefix' => 'api'], function ($router) {
         Route::get('customer/cloth-profile/index', [CustomerClothProfileController::class, 'index']);
         Route::post('customer/cloth-profile/store', [CustomerClothProfileController::class, 'store']);
         Route::put('customer/cloth-profile/update/{id}', [CustomerClothProfileController::class, 'update']);
+        Route::get('customer/cloth-profile/show/{id}', [CustomerClothProfileController::class, 'show']);
 
     });
 });

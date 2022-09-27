@@ -60,6 +60,26 @@ class CustomerClothProfileController extends Controller
         return CustomerClothProfile::where('customer_id', $customer->id)->get()->toArray();
     }
 
+    public function show(int $id)
+    {
+        $customer = auth($this->guard)->user();
+        $customerClothProfile = CustomerClothProfile::find($id);
+
+        if($customerClothProfile){
+            if($customerClothProfile->customer_id == $customer->id){
+                return response()->json($customerClothProfile, 200);
+            } else {
+                return response()->json([
+                    'message' => 'you are not authrized to get this profile, you can only get your cloth profile.',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'message' => 'cloth profile not found with id ' . $id . '.',
+            ]);
+        }
+    }
+
     /**
      * Get user address.
      *
@@ -70,6 +90,7 @@ class CustomerClothProfileController extends Controller
         $customer = auth($this->guard)->user();
 
         $addresses = $customer->addresses()->get();
+
 
         return CustomerAddressResource::collection($addresses);
     }
