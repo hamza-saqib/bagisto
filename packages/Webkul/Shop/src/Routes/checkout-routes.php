@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Webkul\Core\Http\Controllers\CountryStateController;
 use Webkul\Shop\Http\Controllers\CartController;
 use Webkul\Shop\Http\Controllers\OnepageController;
+use Webkul\Customer\Http\Controllers\API\CustomerClothProfileController;
 
 Route::group(['middleware' => ['web', 'locale', 'theme', 'currency']], function () {
     /**
@@ -85,5 +86,15 @@ Route::group(['middleware' => ['web', 'locale', 'theme', 'currency']], function 
          * For customer login checkout.
          */
         Route::post('/customer/checkout/login', [OnepageController::class, 'loginForCheckout'])->name('customer.checkout.login');
+    });
+});
+
+//api new routes
+Route::group(['prefix' => 'api'], function ($router) {
+
+    Route::group(['middleware' => ['locale', 'theme', 'currency']], function ($router) {
+
+        Route::post('cart/customized-product-image', [CustomerClothProfileController::class, 'saveCustomizedProductImage']);
+
     });
 });

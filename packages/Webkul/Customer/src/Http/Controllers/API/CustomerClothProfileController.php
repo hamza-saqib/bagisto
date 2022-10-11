@@ -173,4 +173,29 @@ class CustomerClothProfileController extends Controller
         }
 
     }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function saveCustomizedProductImage()
+    {
+        if (request()->hasFile('product_customized_image')) {
+            $productCustomizedImage = request()->file('product_customized_image');
+            $productCustomizedImageName = time() . '_' . $productCustomizedImage->getClientOriginalName();
+            $productCustomizedImage->move(public_path() . '/storage/images/customized-products', $productCustomizedImageName);
+            return response()->json([
+                'success' => true,
+                'message' => 'Image uploaded successfully',
+                'data' => ['image_name'=>$productCustomizedImageName],
+            ], 400);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please add image.',
+            ], 400);
+        }
+    }
 }
