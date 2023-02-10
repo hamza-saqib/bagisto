@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -12,3 +14,10 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::group(['prefix' => 'fabric'], function(){
+    Route::get('get', 'App\Http\Controllers\FabricController@index');
+    Route::post('store', 'App\Http\Controllers\FabricController@store');
+    Route::get('getFabricAssetsImage/{fabricId}/{productId}', 'App\Http\Controllers\FabricController@getFabricPicturesById');
+});
+

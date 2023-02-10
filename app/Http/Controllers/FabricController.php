@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\AssetsModel;
+use App\FabricsModel;
+use App\StylesModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class FabricController extends Controller
+{
+    public function index(){
+        $where = [];
+
+        if(isset($_GET['product_id']))
+        {
+            $where = ['product_id' => $_GET['product_id']];
+        }
+        $fabrics = FabricsModel::where($where)->get();
+        return response()->json([
+            'status' => true,
+            'result' => $fabrics
+        ], 200);
+    }
+
+    public function store(Request $request){
+    // $validator = Validator::make($request->all(), [
+    //     "name" => "required",
+    //     "color" => "required"
+    // ]);
+    // if ($validator->fails()) {
+    //     return response()->json([
+    //         'status' => false,
+    //         'message' => $validator->errors()
+    //     ], 400);
+    // } // validate fails
+
+        $fabrics = $request->all();
+        $checkFabricExist = FabricsModel::where([
+            'name' => $fabrics[0]['name'],
+            'color' => $fabrics[0]['color']
+        ])->exists();
+        if($checkFabricExist)
+        {
+            return response()->json([
+             'status' => false,
+             'message' => 'This fabric is already exist'
+         ], 400);
+        }
+        foreach($fabrics as $key => $fabric){
+            $fabricData = [
+                'name'          => isset($fabric['name']) ? $fabric['name'] : ' - ',
+                'color'         => isset($fabric['color']) ? $fabric['color'] : ' - ',
+                'image'         => isset($fabric['image']) ? $fabric['image'] : ' - ',
+                'image_link'    => isset($fabric['image_link']) ? $fabric['image_link'] : ' - ',
+                'product_id'    => isset($fabric['product_id']) ? $fabric['product_id'] : ' - ',
+            ];
+
+            $fabricInserted =  FabricsModel::create($fabricData);
+            $fabricId = $fabricInserted->id;
+            $productId = $fabric['product_id'];
+            foreach($fabric['assets'] as $assetKey => $asset){
+                $checkAssetExists = AssetsModel::where('name', $assetKey)->first();
+                if(isset($checkAssetExists->id)){
+                    $assetId = $checkAssetExists->id;
+                }
+                else
+                {
+                    $assetData = [
+                        'name' => $assetKey,
+                        'image' => isset($asset['image']) ? $asset['image'] : ' - ',
+                        'image_link' => isset($asset['image_link']) ? $asset['image_link'] : ' - ',
+                        'product_id' => $productId
+                    ];
+    
+                    $assetInserted = AssetsModel::create($assetData);
+                    $assetId = $assetInserted->id;
+                }
+                
+                foreach($asset['styles'] as $styleKey => $style){
+                    $styleData = [
+                        'name' => isset($style['name']) ? $style['name'] : ' - ',
+                        'image' => isset($style['image']) ? $style['image'] : ' - ',
+                        'image_link' => isset($style['image_link']) ? $style['image_link'] : ' - ',
+                        'product_id' => $productId,
+                        'asset_id' => $assetId,
+                        'fabric_id' => $fabricId
+                    ];  
+
+                    $styleInserted = StylesModel::create($styleData);
+                    $styleId = $styleInserted->id;
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Fabric has been added successfully'
+        ], 200);
+    }
+
+    function getFabricPicturesById($fabricId, $productId)
+    {
+        $fabricProductArray = [];
+        $fabricArray = [];
+        $fabricPicturesData = FabricsModel::where(['id' => $fabricId, 'product_id' => $productId])->get();
+        $fabricAssets = AssetsModel::where('product_id', $productId)->get();
+        foreach($fabricPicturesData as $results){
+            $fabricProductArray = [
+                'name' => $results['name'],
+                'color' => $results['color'],
+                'product_id' => $results['product_id'],
+                'image' => $results['image'],
+                "image_link" => $results['image_link']
+            ]; 
+        }
+
+        foreach($fabricAssets as $assetKey => $asset){
+        
+            $styles = StylesModel::where(['fabric_id' => $fabricId, 'asset_id' => $asset['id']])->get();
+            $styleArray = [];
+            foreach($styles as $style){
+                $styleArray[] = [
+                    'name' => $style['name'],
+                    'image' => $style['image'],
+                    'image_link' => $style['image_link']
+                ];
+            }
+
+            $fabricArray[$asset['name']][] = [
+                "image" => $asset['image'],
+                "image_link" => $asset['image_link'],
+                'styles' => $styleArray
+            ];
+        }   
+
+        $fabricProductArray['assets'] = $fabricArray;
+        return response()->json([
+            'status' => true,
+            'result' => $fabricProductArray
+        ], 200);
+    }
+}
+
