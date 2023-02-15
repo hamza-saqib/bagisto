@@ -18,6 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'fabric'], function(){
     Route::get('get', 'App\Http\Controllers\FabricController@index');
     Route::post('store', 'App\Http\Controllers\FabricController@store');
-    Route::get('getFabricAssetsImage/{fabricId}/{productId}', 'App\Http\Controllers\FabricController@getFabricPicturesById');
+    Route::get('getFabricAssetsImage', 'App\Http\Controllers\FabricController@getFabricPicturesById');
 });
 

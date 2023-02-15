@@ -6,6 +6,7 @@ use App\AssetsModel;
 use App\FabricsModel;
 use App\StylesModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class FabricController extends Controller
@@ -18,6 +19,13 @@ class FabricController extends Controller
             $where = ['product_id' => $_GET['product_id']];
         }
         $fabrics = FabricsModel::where($where)->get();
+        if(!$fabrics){
+            return response()->json([
+                'status' => false,
+                'result' => [],
+                'message' => "No Fabrics Found"
+            ], 400);    
+        }
         return response()->json([
             'status' => true,
             'result' => $fabrics
@@ -25,6 +33,7 @@ class FabricController extends Controller
     }
 
     public function store(Request $request){
+        
     // $validator = Validator::make($request->all(), [
     //     "name" => "required",
     //     "color" => "required"
@@ -69,27 +78,43 @@ class FabricController extends Controller
                 {
                     $assetData = [
                         'name' => $assetKey,
-                        'image' => isset($asset['image']) ? $asset['image'] : ' - ',
-                        'image_link' => isset($asset['image_link']) ? $asset['image_link'] : ' - ',
                         'product_id' => $productId
                     ];
     
                     $assetInserted = AssetsModel::create($assetData);
                     $assetId = $assetInserted->id;
                 }
-                
-                foreach($asset['styles'] as $styleKey => $style){
-                    $styleData = [
-                        'name' => isset($style['name']) ? $style['name'] : ' - ',
-                        'image' => isset($style['image']) ? $style['image'] : ' - ',
-                        'image_link' => isset($style['image_link']) ? $style['image_link'] : ' - ',
-                        'product_id' => $productId,
-                        'asset_id' => $assetId,
-                        'fabric_id' => $fabricId
-                    ];  
-
-                    $styleInserted = StylesModel::create($styleData);
-                    $styleId = $styleInserted->id;
+                foreach($asset as $assetTypeKey => $assetType){
+                    $checkAssetTypeExists = AssetsModel::where(['name' => $assetTypeKey, 'parent_id' => $assetId])->first();
+                    if(isset($checkAssetTypeExists->id)){
+                        $assetTypeId = $checkAssetTypeExists->id;
+                    }
+                    else
+                    {
+                        $assetData = [
+                            'name' => $assetTypeKey,
+                            'image' => isset($assetType['image']) ? $assetType['image'] : ' - ',
+                            'image_link' => isset($assetType['image_link']) ? $assetType['image_link'] : ' - ',
+                            'product_id' => $productId,
+                            'parent_id' => $assetId
+                        ];
+        
+                        $assetTypeInserted = AssetsModel::create($assetData);
+                        $assetTypeId = $assetTypeInserted->id;
+                    }
+                    foreach($assetType['styles'] as $styleKey => $style){
+                        $styleData = [
+                            'name' => isset($style['name']) ? $style['name'] : ' - ',
+                            'image' => isset($style['image']) ? $style['image'] : ' - ',
+                            'image_link' => isset($style['image_link']) ? $style['image_link'] : ' - ',
+                            'product_id' => $productId,
+                            'asset_id' => $assetTypeId,
+                            'fabric_id' => $fabricId
+                        ];  
+    
+                        $styleInserted = StylesModel::create($styleData);
+                        $styleId = $styleInserted->id;
+                    }
                 }
             }
         }
@@ -100,12 +125,25 @@ class FabricController extends Controller
         ], 200);
     }
 
-    function getFabricPicturesById($fabricId, $productId)
+    function getFabricPicturesById(Request $request)
     {
+        $fabricId = $request->input('fabricId');
+        $productId = $request->input('productId');
         $fabricProductArray = [];
         $fabricArray = [];
         $fabricPicturesData = FabricsModel::where(['id' => $fabricId, 'product_id' => $productId])->get();
-        $fabricAssets = AssetsModel::where('product_id', $productId)->get();
+        if(!$fabricPicturesData){
+            return response()->json([
+                'status' => false,
+                'result' => [],
+                'message' => "No Fabric Data Found"
+            ], 400);    
+        }
+        $fabricAssets = AssetsModel::where('assets.product_id', $productId)
+        ->select('assets.name as parent_name' ,'a.*')
+        ->join('assets as a', 'a.parent_id', "=", "assets.id")
+        ->get();
+        
         foreach($fabricPicturesData as $results){
             $fabricProductArray = [
                 'name' => $results['name'],
@@ -117,7 +155,7 @@ class FabricController extends Controller
         }
 
         foreach($fabricAssets as $assetKey => $asset){
-        
+            
             $styles = StylesModel::where(['fabric_id' => $fabricId, 'asset_id' => $asset['id']])->get();
             $styleArray = [];
             foreach($styles as $style){
@@ -128,13 +166,13 @@ class FabricController extends Controller
                 ];
             }
 
-            $fabricArray[$asset['name']][] = [
+            $fabricArray[$asset['name']][$asset['parent_name']][] = [
                 "image" => $asset['image'],
                 "image_link" => $asset['image_link'],
                 'styles' => $styleArray
             ];
         }   
-
+        
         $fabricProductArray['assets'] = $fabricArray;
         return response()->json([
             'status' => true,

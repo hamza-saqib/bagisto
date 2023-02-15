@@ -15,6 +15,7 @@ class AssetsModel extends Model
         'color',
         'image',
         'image_link',
-        'product_id'
+        'product_id',
+        'parent_id'
     ];
 }

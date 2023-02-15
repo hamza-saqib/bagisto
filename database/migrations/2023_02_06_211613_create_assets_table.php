@@ -17,8 +17,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('product_id');
-            $table->string('image');
-            $table->string('image_link');
+            $table->integer('parent_id')->default(0);
+            $table->string('image')->nullable();
+            $table->string('image_link')->nullable();
             $table->timestamps();
         });
     }
