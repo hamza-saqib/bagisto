@@ -19,7 +19,7 @@ class FabricController extends Controller
             $where = ['product_id' => $_GET['product_id']];
         }
         $fabrics = FabricsModel::where($where)->get();
-        if(!$fabrics){
+        if(count($fabrics) == 0){
             return response()->json([
                 'status' => false,
                 'result' => [],
@@ -132,11 +132,11 @@ class FabricController extends Controller
         $fabricProductArray = [];
         $fabricArray = [];
         $fabricPicturesData = FabricsModel::where(['id' => $fabricId, 'product_id' => $productId])->get();
-        if(!$fabricPicturesData){
+        if(count($fabricPicturesData) == 0){
             return response()->json([
                 'status' => false,
                 'result' => [],
-                'message' => "No Fabric Data Found"
+                'message' => "No Fabric Asset Images Found"
             ], 400);    
         }
         $fabricAssets = AssetsModel::where('assets.product_id', $productId)
