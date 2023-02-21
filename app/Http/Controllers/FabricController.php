@@ -6,6 +6,7 @@ use App\AssetsModel;
 use App\FabricsModel;
 use App\StylesModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -177,6 +178,20 @@ class FabricController extends Controller
         return response()->json([
             'status' => true,
             'result' => $fabricProductArray
+        ], 200);
+    }
+    function generatePresignedUrl(){
+        $s3 = App::make('aws')->createClient('s3');   
+        $cmd = $s3->getCommand('GetObject', [
+            'Bucket' => env("AWS_BUCKET"),
+            'Key' => env("AWS_ACCESS_KEY_ID")
+        ]);     
+        $request = $s3->createPresignedRequest($cmd, '+60 minutes');
+
+        $presignedUrl = (string)$request->getUri();
+        return response()->json([
+            'status' => true,
+            'result' => $presignedUrl
         ], 200);
     }
 }

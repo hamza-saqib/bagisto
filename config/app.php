@@ -226,6 +226,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Aws\Laravel\AwsServiceProvider::class,
 
         /*
          * Package Service Providers.
@@ -312,5 +313,6 @@ return [
         'ProductImage' => Webkul\Product\Facades\ProductImage::class,
         'ProductVideo' => Webkul\Product\Facades\ProductVideo::class,
         'Redis' => Illuminate\Support\Facades\Redis::class,
+        'AWS' => Aws\Laravel\AwsFacade::class,
     ])->toArray(),
 ];
