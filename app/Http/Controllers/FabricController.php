@@ -180,19 +180,39 @@ class FabricController extends Controller
             'result' => $fabricProductArray
         ], 200);
     }
-    function generatePresignedUrl(){
-        $s3 = App::make('aws')->createClient('s3');   
-        $cmd = $s3->getCommand('PutObject', [
-            'Bucket' => env("AWS_BUCKET"),
-            'Key' => env("AWS_ACCESS_KEY_ID")
-        ]);     
-        $request = $s3->createPresignedRequest($cmd, '+60 minutes');
+    private function generateRandomString($length = 10) {
+       $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[random_int(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+    function generatePresignedUrl(Request $request){
+        
+        $imageCount = $request->header('imageCount');
+        
+        $urls = [];
+        for($i=1; $i<=$imageCount; $i++)
+        {
+            $imgName = $this->generateRandomString();
+            $s3 = App::make('aws')->createClient('s3');   
+            $cmd = $s3->getCommand('PutObject', [
+                'Bucket' => env("AWS_BUCKET"),
+                'Key' =>  $imgName
+            ]);     
+            $request = $s3->createPresignedRequest($cmd, '+120 minutes');
 
-        $presignedUrl = (string)$request->getUri();
+            $presignedUrl = (string)$request->getUri();
+            $urls[$imgName] = $presignedUrl;
+        }
+
         return response()->json([
             'status' => true,
-            'result' => $presignedUrl
+            'result' => $urls
         ], 200);
+        
     }
 }
 
