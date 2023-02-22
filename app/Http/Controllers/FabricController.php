@@ -182,7 +182,7 @@ class FabricController extends Controller
     }
     function generatePresignedUrl(){
         $s3 = App::make('aws')->createClient('s3');   
-        $cmd = $s3->getCommand('GetObject', [
+        $cmd = $s3->getCommand('PutObject', [
             'Bucket' => env("AWS_BUCKET"),
             'Key' => env("AWS_ACCESS_KEY_ID")
         ]);     
