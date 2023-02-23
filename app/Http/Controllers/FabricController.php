@@ -200,7 +200,9 @@ class FabricController extends Controller
             $s3 = App::make('aws')->createClient('s3');   
             $cmd = $s3->getCommand('PutObject', [
                 'Bucket' => env("AWS_BUCKET"),
-                'Key' =>  $imgName
+                'Key' =>  $imgName,
+                'ResponseContentDisposition' => 'attachment;filename='. $imgName,
+                'ResponseContentLanguage' => 'en'
             ]);     
             $request = $s3->createPresignedRequest($cmd, '+120 minutes');
 
