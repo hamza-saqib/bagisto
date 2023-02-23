@@ -201,6 +201,7 @@ class FabricController extends Controller
             $cmd = $s3->getCommand('PutObject', [
                 'Bucket' => env("AWS_BUCKET"),
                 'Key' =>  $imgName,
+                'ACL' => 'public-read',
                 'ResponseContentDisposition' => 'attachment;filename='. $imgName,
                 'ResponseContentLanguage' => 'en'
             ]);     
