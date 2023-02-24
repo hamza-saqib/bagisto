@@ -190,27 +190,32 @@ class FabricController extends Controller
         return $randomString;
     }
     function generatePresignedUrl(Request $request){
-        
-        $imageCount = $request->header('imageCount');
-        
+        $imageNameJson = $request->header('imagesName');
         $urls = [];
-        for($i=1; $i<=$imageCount; $i++)
-        {
-            $imgName = $this->generateRandomString();
-            $s3 = App::make('aws')->createClient('s3');   
+        $s3 = App::make('aws')->createClient('s3'); 
+        // $imageNameJson= '{
+        //     "imageNamecollar1" : "FabricName/collar/Fornt/singelb/imageNamecollar1",
+        //     "imageNamecollar2" : "FabricName/collar/Fold/singelb/imageNamecollar2",
+        //     "imageNamecuff1" : "FabricName/cuff/Fold/singelb/imageNamecuff1",
+        //     "imageNamecuff2" : "FabricName/cuff/Fornt/singelb/imageNamecuff2"
+        // }';
+        $imageNameArray = json_decode($imageNameJson);  
+        foreach($imageNameArray as $imageName => $directoryName){
             $cmd = $s3->getCommand('PutObject', [
                 'Bucket' => env("AWS_BUCKET"),
-                'Key' =>  $imgName,
+                'Key' =>  $directoryName,
                 'ACL' => 'public-read',
-                'ResponseContentDisposition' => 'attachment;filename='. $imgName,
+                'ResponseContentDisposition' => 'attachment;filename='. $imageName,
                 'ResponseContentLanguage' => 'en'
             ]);     
             $request = $s3->createPresignedRequest($cmd, '+120 minutes');
 
             $presignedUrl = (string)$request->getUri();
-            $urls[$imgName] = $presignedUrl;
-        }
+            $urls[$imageName]['presinedUrl'] = $presignedUrl;
+            $getObject = "https://s3.amazonaws.com/".env("AWS_BUCKET")."/".$directoryName;
+            $urls[$imageName]['getImageUrl'] = $getObject;
 
+        }
         return response()->json([
             'status' => true,
             'result' => $urls
