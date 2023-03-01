@@ -34,23 +34,12 @@ class FabricController extends Controller
     }
 
     public function store(Request $request){
-        
-    // $validator = Validator::make($request->all(), [
-    //     "name" => "required",
-    //     "color" => "required"
-    // ]);
-    // if ($validator->fails()) {
-    //     return response()->json([
-    //         'status' => false,
-    //         'message' => $validator->errors()
-    //     ], 400);
-    // } // validate fails
-
         $fabrics = $request->all();
         $checkFabricExist = FabricsModel::where([
             'name' => $fabrics[0]['name'],
             'color' => $fabrics[0]['color']
         ])->exists();
+        
         if($checkFabricExist)
         {
             return response()->json([
@@ -66,7 +55,6 @@ class FabricController extends Controller
                 'image_link'    => isset($fabric['image_link']) ? $fabric['image_link'] : ' - ',
                 'product_id'    => isset($fabric['product_id']) ? $fabric['product_id'] : ' - ',
             ];
-
             $fabricInserted =  FabricsModel::create($fabricData);
             $fabricId = $fabricInserted->id;
             $productId = $fabric['product_id'];
@@ -140,11 +128,12 @@ class FabricController extends Controller
                 'message' => "No Fabric Asset Images Found"
             ], 400);    
         }
+
         $fabricAssets = AssetsModel::where('assets.product_id', $productId)
         ->select('assets.name as parent_name' ,'a.*')
         ->join('assets as a', 'a.parent_id', "=", "assets.id")
         ->get();
-        
+
         foreach($fabricPicturesData as $results){
             $fabricProductArray = [
                 'name' => $results['name'],
@@ -154,9 +143,7 @@ class FabricController extends Controller
                 "image_link" => $results['image_link']
             ]; 
         }
-
         foreach($fabricAssets as $assetKey => $asset){
-            
             $styles = StylesModel::where(['fabric_id' => $fabricId, 'asset_id' => $asset['id']])->get();
             $styleArray = [];
             foreach($styles as $style){
@@ -173,32 +160,16 @@ class FabricController extends Controller
                 'styles' => $styleArray
             ];
         }   
-        
         $fabricProductArray['assets'] = $fabricArray;
         return response()->json([
             'status' => true,
             'result' => $fabricProductArray
         ], 200);
     }
-    private function generateRandomString($length = 10) {
-       $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[random_int(0, $charactersLength - 1)];
-        }
-        return $randomString;
-    }
     function generatePresignedUrl(Request $request){
         $imageNameJson = $request->header('imagesName');
         $urls = [];
         $s3 = App::make('aws')->createClient('s3'); 
-        // $imageNameJson= '{
-        //     "imageNamecollar1" : "FabricName/collar/Fornt/singelb/imageNamecollar1",
-        //     "imageNamecollar2" : "FabricName/collar/Fold/singelb/imageNamecollar2",
-        //     "imageNamecuff1" : "FabricName/cuff/Fold/singelb/imageNamecuff1",
-        //     "imageNamecuff2" : "FabricName/cuff/Fornt/singelb/imageNamecuff2"
-        // }';
         $imageNameArray = json_decode($imageNameJson);  
         foreach($imageNameArray as $imageName => $directoryName){
             $cmd = $s3->getCommand('PutObject', [
