@@ -193,5 +193,16 @@ class FabricController extends Controller
         ], 200);
         
     }
+
+    function deleteFabric($fabricId){
+        FabricsModel::where('id', $fabricId)->delete();
+        AssetsModel::where('product_id', 1)->delete();
+        StylesModel::where('fabric_id', $fabricId)->delete();
+
+        return response()->json([
+            'status' => true,
+            'result' => "Fabric details has been deleted"
+        ], 200);
+    }
 }
 

@@ -20,5 +20,6 @@ Route::group(['prefix' => 'fabric'], function(){
     Route::post('store', 'App\Http\Controllers\FabricController@store');
     Route::get('getFabricAssetsImage', 'App\Http\Controllers\FabricController@getFabricPicturesById');
     Route::get('generateS3Url', 'App\Http\Controllers\FabricController@generatePresignedUrl');
+    Route::get('deleteFabric/{fabricId}', 'App\Http\Controllers\FabricController@deleteFabric');
 });
 
