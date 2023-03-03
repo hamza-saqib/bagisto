@@ -21,6 +21,7 @@ package-lock.json
 /public/themes
 /public/vendor
 /public/frontend
+/public/static
 /lang/vendor
 /storage/*.key
 /storage/dcc-data/
